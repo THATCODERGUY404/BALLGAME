@@ -64,7 +64,7 @@ while running:
     if c <= 80:
         ball_colour = "orange"
     else:
-        ball_colour = "blue"
+        ball_colour = "pink"
 
 
     
