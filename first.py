@@ -62,7 +62,7 @@ while running:
     c = math.sqrt(math.pow(ball_pos.x-player_pos.x,2) + math.pow(ball_pos.y-player_pos.y,2))
     
     if c <= 80:
-        ball_colour = "red"
+        ball_colour = "orange"
     else:
         ball_colour = "blue"
 
