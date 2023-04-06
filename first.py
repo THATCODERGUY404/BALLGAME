@@ -2,8 +2,6 @@
 import pygame
 import math
 # pygame setup
-hastighetx = 200
-hastighety = 250
 höjd = 1280
 bredd = 720
 pygame.init()
@@ -13,9 +11,12 @@ running = True
 dt = 0
 bredd = 1280
 höjd = 720
-player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
+player_pos = pygame.Vector2(screen.get_width() / 3, screen.get_height() / 2)
 ball_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
 ball_colour = "blue" 
+velocity = pygame.Vector2(300,300)
+hit = False
+
 while running:
     # poll for events
     # pygame.QUIT event means the user clicked X to close your window
@@ -45,28 +46,30 @@ while running:
 
     #X led hastighet
     if ball_pos.x >= bredd or ball_pos.x <= 0: 
-        hastighetx = -hastighetx
-
-    ball_pos.x += hastighetx * dt 
+        velocity.x = - velocity.x
 
     #Y led hastighet
     if ball_pos.y >= höjd or ball_pos.y <= 0: 
-        hastighety = -hastighety
+        velocity.y = -velocity.y
 
-    ball_pos.y += hastighety * dt 
+
+    distvec = ball_pos - player_pos
+    normalvec = distvec.normalize()
     
-
-
-
     #collision detection
-    c = math.sqrt(math.pow(ball_pos.x-player_pos.x,2) + math.pow(ball_pos.y-player_pos.y,2))
-    
-    if c <= 80:
+    c = distvec.magnitude()
+    timeToHit = (c - 80)/velocity.magnitude()
+
+    if(not hit and timeToHit < dt) :
+        ball_pos += velocity * timeToHit 
+        velocity = velocity.reflect(normalvec)
+        ball_pos += velocity * (dt - timeToHit)
         ball_colour = "orange"
+        hit = True
     else:
         ball_colour = "pink"
-
-
+        ball_pos += velocity * dt
+        hit = False
     
     #background
     screen.fill("black")
@@ -74,6 +77,9 @@ while running:
     pygame.draw.circle(screen, "white",player_pos, 40)
     #ball
     pygame.draw.circle(screen, ball_colour,ball_pos, 40)
+
+    pygame.draw.line(screen, "white", ball_pos, player_pos)
+
     # flip() the display to put your work on screen
     pygame.display.flip()
 
