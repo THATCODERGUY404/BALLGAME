@@ -13,9 +13,13 @@ bredd = 1280
 höjd = 720
 player_pos = pygame.Vector2(screen.get_width() / 3, screen.get_height() / 2)
 ball_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
+player_pos2 = pygame.Vector2(screen.get_width() / 3, screen.get_height() / 2)
 ball_colour = "blue" 
 velocity = pygame.Vector2(300,300)
 hit = False
+text_color = (255, 255, 255)
+score = 0
+font = pygame.font.SysFont(None, 24)
 
 while running:
     # poll for events
@@ -29,10 +33,12 @@ while running:
         player_pos.y -= 300 * dt
     if keys [pygame.K_s]:
         player_pos.y += 300 * dt
-    if keys [pygame.K_d]:
-        player_pos.x += 300 * dt
-    if keys [pygame.K_a]:
-        player_pos.x -= 300 * dt
+
+    keys = pygame.key.get_pressed()
+    if keys [pygame.K_o]:
+        player_pos2.y -= 300 * dt
+    if keys [pygame.K_l]:
+        player_pos2.y += 300 * dt
 
     if player_pos.x < 0:
         player_pos.x = 0
@@ -43,15 +49,22 @@ while running:
     if player_pos.y < 0:
         player_pos.y = 0
 
-
+    if player_pos2.x < 0:
+        player_pos2.x = 0
+    if player_pos2.x > bredd:
+        player_pos2.x = bredd
+    if player_pos2.y > höjd:
+        player_pos2.y = höjd
+    if player_pos2.y < 0:
+        player_pos2.y = 0
     #X led hastighet
     if ball_pos.x >= bredd or ball_pos.x <= 0: 
         velocity.x = - velocity.x
+        score = score + 1
 
     #Y led hastighet
     if ball_pos.y >= höjd or ball_pos.y <= 0: 
         velocity.y = -velocity.y
-
 
     distvec = ball_pos - player_pos
     normalvec = distvec.normalize()
@@ -71,15 +84,22 @@ while running:
         ball_pos += velocity * dt
         hit = False
     
+
     #background
     screen.fill("black")
     #player
     pygame.draw.circle(screen, "white",player_pos, 40)
+    pygame.draw.circle(screen, "white",player_pos2, 40)
+    
     #ball
     pygame.draw.circle(screen, ball_colour,ball_pos, 40)
 
     pygame.draw.line(screen, "white", ball_pos, player_pos)
+    pygame.draw.line(screen, "white", ball_pos, player_pos2)
 
+    img = font.render(str(score), True, text_color)
+    screen.blit(img, (740, 20))
+    
     # flip() the display to put your work on screen
     pygame.display.flip()
 
