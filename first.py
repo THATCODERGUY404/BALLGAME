@@ -16,10 +16,29 @@ ball_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
 player_pos2 = pygame.Vector2(screen.get_width() / 3, screen.get_height() / 2)
 ball_colour = "blue" 
 velocity = pygame.Vector2(300,300)
-hit = False
 text_color = (255, 255, 255)
 score = 0
 font = pygame.font.SysFont(None, 24)
+
+def collision_detection(player_pos, ball_pos, velocity, dt) :
+
+    distvec = ball_pos - player_pos
+    normalvec = distvec.normalize()
+
+    #collision detection
+    c = distvec.magnitude()
+    timeToHit = (c - 80)/velocity.magnitude()
+    hit = False
+
+    if(not hit and timeToHit < dt) :
+        ball_pos += velocity * timeToHit 
+        velocity = velocity.reflect(normalvec)
+        ball_pos += velocity * (dt - timeToHit)
+        hit = True
+    else:
+        ball_pos += velocity * dt
+        hit = False
+    return ball_pos, velocity
 
 while running:
     # poll for events
@@ -66,25 +85,10 @@ while running:
     if ball_pos.y >= höjd or ball_pos.y <= 0: 
         velocity.y = -velocity.y
 
-    distvec = ball_pos - player_pos
-    normalvec = distvec.normalize()
-    
-    #collision detection
-    c = distvec.magnitude()
-    timeToHit = (c - 80)/velocity.magnitude()
 
-    if(not hit and timeToHit < dt) :
-        ball_pos += velocity * timeToHit 
-        velocity = velocity.reflect(normalvec)
-        ball_pos += velocity * (dt - timeToHit)
-        ball_colour = "orange"
-        hit = True
-    else:
-        ball_colour = "pink"
-        ball_pos += velocity * dt
-        hit = False
+    ball_pos, velocity = collision_detection(player_pos, ball_pos, velocity, dt)
+    ball_pos, velocity = collision_detection(player_pos2, ball_pos, velocity, dt)
     
-
     #background
     screen.fill("black")
     #player
@@ -96,7 +100,6 @@ while running:
 
     pygame.draw.line(screen, "white", ball_pos, player_pos)
     pygame.draw.line(screen, "white", ball_pos, player_pos2)
-
     img = font.render(str(score), True, text_color)
     screen.blit(img, (740, 20))
     
